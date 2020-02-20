@@ -5,7 +5,7 @@
 
 import Foundation
 
-class Concentration {
+struct Concentration {
 
     private var indexOfOnlyUpCard: Int?
 
@@ -32,7 +32,9 @@ class Concentration {
         cards.shuffle()
     }
     
-    func chooseCard(at index: Int){
+    // when Concentration was changed from class to struct, had to update `func chooseCard()` to `mutating func chooseCard()`
+    // modifying cards, matches, flips, etc. properties of this struct is mutating the struct
+    mutating func chooseCard(at index: Int) {
         assert(cards.indices.contains(index), "card out of index")
         // if already matched, do nothing
         if !cards[index].isMatched {
@@ -42,7 +44,7 @@ class Concentration {
             // unwrap indexOfOnlyUpCard and check if index != matchIndex
             if let matchIndex = indexOfOnlyUpCard, index != matchIndex {
                 // only one card was up, and it wasn't selected again
-                if cards[matchIndex].type == cards[index].type {
+                if cards[matchIndex] == cards[index] {
                     // match found
                     cards[index].isMatched = true
                     cards[matchIndex].isMatched = true

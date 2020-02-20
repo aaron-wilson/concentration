@@ -7,11 +7,12 @@ import UIKit
 
 class ViewController: UIViewController {
     
+    // Swift all vars have to be fully initialized before can access any of its properties, lazy keyword allows to bypass this until the var is used
     private lazy var game = Concentration(numberOfCards: cardButtons.count)
     private var themes = [Theme]()
     private var theme: Theme!
-    private var emoji = [Int:String]() // dictionary
-    private var unusedEmojis = [String]()
+    private var emoji = [Card:String]() // dictionary
+    private var unusedEmojis: String!
     
     @IBOutlet private var cardButtons: [UIButton]!
     @IBOutlet private weak var newGameButton: UIButton!
@@ -59,7 +60,7 @@ class ViewController: UIViewController {
                 name: "Halloween",
                 primaryColor: #colorLiteral(red: 1, green: 0.5763723254, blue: 0, alpha: 1),
                 secondaryColor: #colorLiteral(red: 0, green: 0, blue: 0, alpha: 1),
-                emojiChoices: ["🦇", "😱", "🙀", "😈", "🎃", "👻", "🍭", "🍬", "🍎"]
+                emojiChoices: "🦇😱🙀😈🎃👻🍭🍬🍎"
             )
         )
         theme = themes[themes.count.arc4random]
@@ -74,7 +75,12 @@ class ViewController: UIViewController {
     }
     
     private func updateViewFromModel() {
-        matchesLabel.text = "Matches: \(game.matches)"
+        let attributes: [NSAttributedString.Key:Any] = [
+            .strokeWidth: 5.0,
+            .strokeColor: #colorLiteral(red: 1, green: 0.5763723254, blue: 0, alpha: 1)
+        ]
+        let attributedString = NSAttributedString(string: "Matches: \(game.matches)", attributes: attributes)
+        matchesLabel.attributedText = attributedString
         if game.isComplete {
             gameCompleteLabel.text = "Completed in \(game.flips) flips"
             newGameButton.backgroundColor = theme.primaryColor
@@ -102,10 +108,11 @@ class ViewController: UIViewController {
     }
     
     private func toEmoji(for card: Card) -> String {
-        if emoji[card.type] == nil {
-            emoji[card.type] = unusedEmojis.remove(at: unusedEmojis.count.arc4random)
+        if emoji[card] == nil {
+            let randomStringIndex = unusedEmojis.index(unusedEmojis.startIndex, offsetBy: unusedEmojis.count.arc4random)
+            emoji[card] = String(unusedEmojis.remove(at: randomStringIndex))
         }
-        return emoji[card.type] ?? "?"
+        return emoji[card] ?? "?"
     }
 
 }
